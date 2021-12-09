@@ -1,7 +1,7 @@
-# Neep numpy for array stuff
+# Need numpy for array stuff
 import numpy as np
 
-# Basically floodfill with at counter
+# Basically floodfill with a counter
 def get_basin_size_and_mark(entries, marks, i, j):
     
     # Mark current placement
@@ -52,17 +52,17 @@ for i in range(1,entries.shape[0]-1):
             basin_sizes.append(get_basin_size_and_mark(entries,marked, i,j))
             
         # Continue loop if entry is not a low point
-        if not entries[i,j] < int(entries[i-1,j]):    
+        if not entries[i,j] < entries[i-1,j]:    
             continue
-        if not int(entries[i,j]) < int(entries[i,j-1]):    
+        if not entries[i,j] < entries[i,j-1]:    
             continue             
-        if not int(entries[i,j]) < int(entries[i,j+1]):    
+        if not entries[i,j] < entries[i,j+1]:    
             continue            
-        if not int(entries[i,j]) < int(entries[i+1,j]):    
+        if not entries[i,j] < entries[i+1,j]:    
             continue
         
         # Add the risk level to the sum
-        risk_levels += int(entries[i,j]) + 1
+        risk_levels += entries[i,j] + 1
 
 # Sport the list of basin sizes            
 basin_sizes = sorted(basin_sizes)
