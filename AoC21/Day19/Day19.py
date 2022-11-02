@@ -54,8 +54,50 @@ def has_overlaps(p1, p2):
                 count = d[k]
                 index_2 = i
                 offset_2 = k
-                    
-    return ((offset_0, index_0), (offset_1, index_1), (offset_2, index_2))          
+                
+    aligned_coordinates = []
+    scanner_position = [0, 0, 0]
+    
+    for _ in p2:
+        aligned_coordinates.append([0, 0, 0])
+    
+    for i in range(3):
+        
+        co = -1
+        flip = False
+        
+        if index_0 % 3 == i:
+            co = index_0
+        elif index_1 % 3 == i:
+            co = index_1
+        elif index_2 % 3 == i:
+            co = index_2
+            
+        if co > 2:
+            flip = True
+            co -= 3
+            
+        if index_0 % 3 == i:
+            scanner_position[i] = offset_0
+        elif index_1 % 3 == i:
+            scanner_position[i] = offset_1
+        elif index_2 % 3 == i:
+            scanner_position[i] = offset_2
+            
+        if flip:
+            scanner_position[i] = -scanner_position[i]
+            
+        for idx, coordinate in enumerate(p2):
+            
+            if flip:
+                aligned_coordinates[idx][i] = -coordinate[co]
+            else:
+                aligned_coordinates[idx][i] = coordinate[co]
+            
+    
+    aligned_coordinates = [tuple(co) for co in aligned_coordinates]
+            
+    return (aligned_coordinates, (offset_0, offset_1, offset_2))          
             
         
 
@@ -85,7 +127,7 @@ offsets = dict()
 discovered = [0]
 undiscovered = [i for i in range(1, len(probes))]
 checked = set()
-
+dists = has_overlaps(probes[0], probes[1])
 mappings = dict()
 
 while len(mappings) < len(probes) - 1:
@@ -98,10 +140,11 @@ while len(mappings) < len(probes) - 1:
             dists = has_overlaps(probes[d], probes[u])
             checked.add((d, u))
             
-            if dists[0][0] == -1 or dists[1][0] == -1 or dists[2][0] == -1:
+            if dists[1][0] == -1 or dists[1][1] == -1 or dists[1][2] == -1:
                 continue
             
-            mappings[u] = ((d, dists))
+            mappings[u] = ((d, dists[1]))
+            probes[u] = dists[0]
             undiscovered.remove(u)
             discovered.append(u)
 
@@ -128,25 +171,6 @@ for k in mappings:
             if target == 0:
                 scannerlocation[idx] += instructions[idx][0]
                 continue
-            """
-            if abs(mappings[target][1][idx][1] - mappings[origin][1][mappings[target][1][idx][1] % 3][1]) < 2:
-                scannerlocation[idx] -= instructions[mappings[target][1][idx][1] % 3][0]
-            else:
-                scannerlocation[idx] += instructions[mappings[target][1][idx][1] % 3][0]
-            """
-            
-            """
-            if mappings[target][1][idx][1] > 2:
-                scannerlocation[idx] -= instructions[mappings[target][1][idx][1] - 3][0]
-            else:
-                scannerlocation[idx] += instructions[mappings[target][1][idx][1]][0]
-            """
-            """
-            if instructions[idx][1] > 2:
-                scannerlocation[idx] = instructions[instructions[idx][1] - 3][0] - scannerlocation[idx]
-            else:
-                scannerlocation[idx] += instructions[instructions[idx][1]][0]
-            """
             
         for b in beacons:
             probe = [0,0,0]

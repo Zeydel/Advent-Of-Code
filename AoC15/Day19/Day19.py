@@ -21,18 +21,20 @@ def getReplacementDict(strings):
         
     return replacements
 
+# Parses the list of strings into the a dict of reverse replacements,
+# meaning that you get replacements that can be used to reduce the string
 def getReverseReplacementDict(replacements):
     
+    # Init empty dict
     reverseReplacements = dict()
     
+    # Parse every lin
     for k in replacements:
         for v in replacements[k]:
-            reverseReplacements[v] = [k]
+            reverseReplacements[v] = k
             
     return reverseReplacements
         
-# Returns the set of molecules you can get from a starting molecule and a 
-# list of substitutions you can perform
 def getSubstitutions(molecule, replacements):
     
     # Init empty set
@@ -48,33 +50,40 @@ def getSubstitutions(molecule, replacements):
                 newMolecules.add(molecule[:s] + r + molecule[s+len(k):])
     return newMolecules
 
-def getNextRound(molecules, replacements):
-    
-    nextRound = set()
-    
-    for m in molecules:
-        nextRound |= getSubstitutions(m, replacements)
-        
-    print(len(nextRound))
-    return nextRound
-    
-def expandGreedy(molecule, target, replacements, depth = 0, maxdepth = float('inf')):
-    
-    if molecule in seen:
-        return maxdepth
-    
-    seen.add(molecule)
-    
-    if molecule == target:
-        return depth
-    
-    if len(molecule) >= len(target):
-        return maxdepth
-    
-    for s in getSubstitutions(molecule, replacements):
-        maxdepth = min(expandGreedy(s, target, replacements, depth+1, maxdepth), maxdepth)
-    
-    return maxdepth
+# Okay, this one is kind of complicated. The problem can be solved by simply
+# using the greedy approach, but the state space is massive. It would probably
+# take years to search it throughly. However just by guessing a sequence of reduction
+# there is a pretty high chance that you will find one that hits the target. I
+# will try my best to explain the below code which tries to do something smarter.
+
+# First, when we look at the dictionary of reverse replacements, we see that
+# we have two different types of reductions:
+# XX => X
+# And
+# X Rn X Ar | X Rn X Y X Ar | X Rn X Y X Y X Ar => X
+# It should be noted that no strings reduce to Rn, Y or Ar
+# The above can be thought about a bit simpler by replacing some string with signs:
+# X ( X ) | X ( X , X ) | X ( X , X , X ) => X
+# Now we can think about how long it takes to reduce this. Any string without
+# Rn Ar or Y of length n reduces to length 1 in n-1 steps. So if we only have
+# this case we can simply calculate the reduction length as 
+# count(molecules) - 1
+# Now, we can think of the other cases
+# X Rn X Ar reduces to X in one step, but it reduces the length by 3 molecules
+# X Rn X Y X Ar reduces to X in one step, but it reduces the length by 5 molecules
+# X Rn X Y X Y X Ar reduces to X in one step, but it reduces the length by 7 molecules
+# So, every one of these strings saves us some steps compared to the XX => X reductions
+# Specifically, we get the Rn and Ar reduction for 'free', and every Y saves us
+# two reductions (the character Y followed by any element). So, adding this to the
+# formula from above, we get the formula:
+# count(molecules) - count(Rn | Ar) - 2*count(Y) - 1
+# This tells us exactly how many steps we need to reduce, which is just the reverse
+# of the expansion and thus the same size
+def findExpansionSize(molecule):
+    moleculeCount = len(re.findall(r'[A-Z][a-z]|[A-Z]', molecule))
+    RnArCount = len(re.findall(r'Rn|Ar', molecule))
+    YCount = len(re.findall(r'Y', molecule))
+    return moleculeCount - RnArCount - 2*YCount - 1
     
     
 # Read input and parse
@@ -83,10 +92,6 @@ strings = f.read().split('\n')
 molecule = strings[-1]
 replacements = getReplacementDict(strings[0:-2])
 reverseReplacements = getReverseReplacementDict(replacements)
-seen = set()
-current = {'e'}
-rounds = 0
 
-
-print(expandGreedy('e', molecule, replacements))
-print(len(getSubstitutions(molecule, replacements)))
+print(f'{len(getSubstitutions(molecule, replacements))} different strings can be created from the starting string')
+print(f'The minimum number of steps needed to expand e to {molecule} is {findExpansionSize(molecule)}')
