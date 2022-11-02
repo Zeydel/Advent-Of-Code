@@ -91,7 +91,6 @@ f = open('input.txt', 'r')
 strings = f.read().split('\n')
 molecule = strings[-1]
 replacements = getReplacementDict(strings[0:-2])
-reverseReplacements = getReverseReplacementDict(replacements)
 
 print(f'{len(getSubstitutions(molecule, replacements))} different strings can be created from the starting string')
 print(f'The minimum number of steps needed to expand e to {molecule} is {findExpansionSize(molecule)}')
