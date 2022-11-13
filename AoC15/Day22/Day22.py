@@ -182,4 +182,3 @@ while len(unexplored) > 0:
 
 print(f'The least mana you can spend to win is {best}')
 print(f'The least mana you can spend to win in hardmode is {bestHardMode}')
-# 1309 too high
