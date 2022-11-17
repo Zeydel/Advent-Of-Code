@@ -36,13 +36,14 @@ def getNextActions(building, depth, elevatorPos):
                 move = copy(building)
                 move[elevatorPos] = [e for e in move[elevatorPos] if e not in c]
                 move[m] = sorted(move[m] + list(c))
-                nextMoves.append((move, depth+1, m))
+                if isValidFloor(move[elevatorPos]) and isValidFloor(move[m]):
+                    nextMoves.append((move, depth+1, m))
                 
     return nextMoves
       
-def buildingToString(building):
+def buildingToString(building, elevatorPos):
     
-    string = ''
+    string = str(elevatorPos)
     
     for f in building:
         string += str(f) + ''.join(sorted(building[f]))
@@ -58,6 +59,12 @@ def isValid(building):
             
     return True
 
+def isValidFloor(floor):
+    for e in floor:
+        if e[1] == 'M' and e[0] + 'G' not in floor and any([g[1] == 'G' for g in floor]):
+            return False
+    return True
+
 def isFinal(building):
     
     return len(building[0]) == 0 and len(building[1]) == 0 and len(building[2]) == 0
@@ -68,30 +75,56 @@ f = open('input.txt', 'r')
 floors = f.read().split('\n')
 
 building = parse(floors)
+originalBuilding = copy(building)
 
 states = [(building, 0, 0)]
 explored = dict()
 best = float('inf')
-
+best2 = float('inf')
 
 while len(states) > 0:
     building, depth, elevatorPos = states.pop(0)
     
-    if not isValid(building):
+    if depth >= best:
         continue
     
-    if buildingToString(building) in explored and explored[buildingToString(building)] > depth:
+    bts = buildingToString(building, elevatorPos)
+    if bts in explored and explored[bts] <= depth:
         continue
     
-    
-    explored[buildingToString(building)] = depth
+    explored[bts] = depth
     
     if isFinal(building) and depth < best:
         best = depth
         
     states += getNextActions(building, depth, elevatorPos)
     
+building = originalBuilding
+building[0] = sorted(building[0] + ['eG', 'eM', 'dG', 'dM'])
+explored = dict()
+states = [(building, 0, 0)]
+maxDepth = 0
+
+while len(states) > 0:
+    building, depth, elevatorPos = states.pop()
+    
+    if depth >= best:
+        continue
+    
+    bts = buildingToString(building, elevatorPos)
+    if bts in explored and explored[bts] <= depth:
+        continue
+    
+    explored[bts] = depth
+    
+    if isFinal(building) and depth < best2:
+        best2 = depth
+        
+    states += getNextActions(building, depth, elevatorPos)
+
+    print(depth)
 print(best)
+print(best2)
     
     
     
