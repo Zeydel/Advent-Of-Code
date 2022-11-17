@@ -58,6 +58,11 @@ def isValid(building):
             
     return True
 
+def isFinal(building):
+    
+    return len(building[0]) == 0 and len(building[1]) == 0 and len(building[2]) == 0
+
+
 # Open input and read the string
 f = open('input.txt', 'r')
 floors = f.read().split('\n')
@@ -65,19 +70,32 @@ floors = f.read().split('\n')
 building = parse(floors)
 
 states = [(building, 0, 0)]
+explored = dict()
+best = float('inf')
 
-test = getNextActions(building, 0, 0)
-
-for s in test:
-    print(buildingToString(s[0]))
-    print(isValid(s[0]))
-    print()
 
 while len(states) > 0:
     building, depth, elevatorPos = states.pop(0)
     
     if not isValid(building):
         continue
+    
+    if buildingToString(building) in explored and explored[buildingToString(building)] > depth:
+        continue
+    
+    
+    explored[buildingToString(building)] = depth
+    
+    if isFinal(building) and depth < best:
+        best = depth
+        
+    states += getNextActions(building, depth, elevatorPos)
+    
+print(best)
+    
+    
+    
+    
     
     
     
