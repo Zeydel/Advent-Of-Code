@@ -89,5 +89,5 @@ while(registers['p'] < len(functions)):
 roundTwo = registers['a']
 
 # Print the results
-print(f'After the first round, the result in register c is {roundOne}')
+print(f'After the first round, the result in register a is {roundOne}')
 print(f'After the second round, the result in register a is {roundTwo}')
