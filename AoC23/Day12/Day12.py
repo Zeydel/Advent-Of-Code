@@ -153,6 +153,7 @@ for i, s in enumerate(springList):
     foldedGroups = groupList[i]*5
     foldedArrangementSum += get_number_of_arrangements('.' + foldedSprings + '.', foldedGroups)
     
+# Print the results
 print(f'There are {arrangementSum} different possible arrangements')
 print(f'There are {foldedArrangementSum} different possible arrangements, using the folded instructions')
 # 227119854665793 too high
