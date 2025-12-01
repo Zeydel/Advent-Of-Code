@@ -100,8 +100,3 @@ zero_clicks = count_zero_clicks(instructions, starting_point, size)
 # Print the results
 print(f'The dial ends at zero {zeroes} times')
 print(f'The passes over zero {zero_clicks} times')
-
-# Too high
-# 6972
-# too low
-# 6698
