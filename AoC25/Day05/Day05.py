@@ -87,7 +87,6 @@ def get_id_count(ranges):
         
     return count
 
-
 # Open file and read as lines
 file = open('input.txt', 'r')
 lines = [line.strip() for line in file.readlines()]
